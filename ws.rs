@@ -10,16 +10,17 @@ fn handle(mut stream: TcpStream) {
         println!("{}", std::str::from_utf8(buf.slice(0, n)));
         let key = "keeeeey";
         let proto = "chat";
-        println!("{}", upgrade_response(key, proto));
-        stream.write(buf.slice(0, n)).unwrap();
+        let response = upgrade_response(key, proto);
+        println!("{}", response);
+        stream.write(response.as_bytes()).unwrap();
       },
       Err(_) => break
     };
   }
 }
 
-fn upgrade_response<'a>(key: &'a str, protocol: &'a str) -> &'a str {
-  (format!("HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: {}\r\nSec-WebSocket-Protocol: {}\r\n\r\n", key, protocol)).as_slice()
+fn upgrade_response<'a>(key: &'a str, protocol: &'a str) -> String {
+  format!("HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: {}\r\nSec-WebSocket-Protocol: {}\r\n\r\n", key, protocol)
 }
 
 fn main() {
